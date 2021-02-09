@@ -2,7 +2,6 @@ from .algorithm import Algorithm
 
 import numpy as np
 import scipy.sparse
-from sklearn.metrics.pairwise import cosine_similarity
 
 
 class EASE(Algorithm):
@@ -15,14 +14,14 @@ class EASE(Algorithm):
     def fit(self, X: scipy.sparse.csr_matrix):
         # Compute P
         XTX = (X.T @ X).toarray()
-        P = np.linalg.inv(XTX + self.l2 * np.identity((X.shape[1]), dtype=np.float32))
+        P = np.linalg.inv(XTX + self.l2 * scipy.sparse.identity((X.shape[1]), dtype=np.float32))
+        del XTX
 
         # Compute B
-        B = np.identity(X.shape[1]) - P @ np.diag(1.0 / np.diag(P))
-        B[np.diag_indices(B.shape[0])] = 0.0
+        B = scipy.sparse.identity(X.shape[1]) - P @ scipy.sparse.diags(1.0 / np.diag(P))
+        np.fill_diagonal(B, 0)
 
         self.similarity_matrix_ = scipy.sparse.csr_matrix(B)
-        print(self.similarity_matrix_)
 
     def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
         predictions = histories @ self.similarity_matrix_

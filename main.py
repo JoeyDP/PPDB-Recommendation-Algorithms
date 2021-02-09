@@ -52,6 +52,15 @@ def iknn(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "
 
 
 @app.command()
+def pop(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5):
+    from src.algorithm.popularity import Popularity
+
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    alg = Popularity(k=top_k)
+    run(alg, X, top_k=top_k)
+
+
+@app.command()
 def ease(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5,
          l2: float = 200.0):
     from src.algorithm.ease import EASE
