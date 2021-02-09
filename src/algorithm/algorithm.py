@@ -1,11 +1,23 @@
+from pathlib import Path
+
+from abc import ABC, abstractmethod
+
 import scipy.sparse
 import numpy as np
 
 
-class Algorithm:
+class Algorithm(ABC):
+    def fit(self, X: scipy.sparse.csr_matrix) -> 'Algorithm':
+        return self
 
-    def fit(self, X: scipy.sparse.csr_matrix):
+    @abstractmethod
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
         pass
 
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    @abstractmethod
+    def save(self, path: Path):
+        pass
+
+    @abstractmethod
+    def load(self, path: Path) -> 'Algorithm':
         pass

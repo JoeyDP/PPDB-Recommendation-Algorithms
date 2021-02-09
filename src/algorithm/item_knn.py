@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .algorithm import Algorithm
 
 import numpy as np
@@ -13,7 +15,7 @@ class ItemKNN(Algorithm):
         self.k = k                      # k=0 means no max neighbors
         self.normalize = normalize
 
-    def fit(self, X: scipy.sparse.csr_matrix):
+    def fit(self, X: scipy.sparse.csr_matrix) -> 'ItemKNN':
         item_cosine_similarities_ = cosine_similarity(X.T, dense_output=True)
 
         # Set diagonal to 0, because we don't want to support self similarity
@@ -33,7 +35,15 @@ class ItemKNN(Algorithm):
             item_cosine_similarities_ = item_cosine_similarities_ / row_sums
 
         self.similarity_matrix_ = scipy.sparse.csr_matrix(item_cosine_similarities_)
+        return self
 
     def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
         predictions = histories @ self.similarity_matrix_
         return predictions.toarray()
+
+    def save(self, path: Path):
+        scipy.sparse.save_npz(path, self.similarity_matrix_)
+
+    def load(self, path: Path) -> 'ItemKNN':
+        self.similarity_matrix_ = scipy.sparse.load_npz(path)
+        return self

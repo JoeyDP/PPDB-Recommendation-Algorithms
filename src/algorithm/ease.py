@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .algorithm import Algorithm
 
 import numpy as np
@@ -11,7 +13,7 @@ class EASE(Algorithm):
         super().__init__()
         self.l2 = l2
 
-    def fit(self, X: scipy.sparse.csr_matrix):
+    def fit(self, X: scipy.sparse.csr_matrix) -> 'EASE':
         # Compute P
         XTX = (X.T @ X).toarray()
         P = np.linalg.inv(XTX + self.l2 * scipy.sparse.identity((X.shape[1]), dtype=np.float32))
@@ -22,7 +24,15 @@ class EASE(Algorithm):
         np.fill_diagonal(B, 0)
 
         self.similarity_matrix_ = scipy.sparse.csr_matrix(B)
+        return self
 
     def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
         predictions = histories @ self.similarity_matrix_
         return predictions.toarray()
+
+    def save(self, path: Path):
+        scipy.sparse.save_npz(path, self.similarity_matrix_)
+
+    def load(self, path: Path) -> 'EASE':
+        self.similarity_matrix_ = scipy.sparse.load_npz(path)
+        return self

@@ -19,6 +19,16 @@ PathArgument = typer.Argument(
     readable=True,
     resolve_path=True,
 )
+PathWArgument = typer.Argument(
+    ...,
+    exists=False,
+    file_okay=False,
+    dir_okay=False,
+    writable=True,
+    readable=True,
+    resolve_path=True,
+)
+
 
 AMOUNT_TEST_USERS = 5
 SEED = 5
@@ -27,7 +37,14 @@ SEED = 5
 def run(alg: Algorithm, X: scipy.sparse.csr_matrix, top_k: int = 5):
     random.seed(SEED)
     np.random.seed(SEED)
+
     alg.fit(X)
+    show_predictions(alg, X, top_k=top_k)
+
+
+def show_predictions(alg: Algorithm, X: scipy.sparse.csr_matrix, top_k: int = 5):
+    random.seed(SEED)
+    np.random.seed(SEED)
 
     test_users = random.sample(list(range(X.shape[0])), AMOUNT_TEST_USERS)
     test_histories = X[test_users, :]
@@ -49,6 +66,27 @@ def iknn(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "
     X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = ItemKNN(k=k, normalize=normalize)
     run(alg, X, top_k=top_k)
+
+
+@app.command()
+def iknn_save(path: Path = PathArgument, model: Path = PathWArgument, item_col: str = "movieId", user_col: str = "userId",
+         k: int = 200, normalize: bool = False):
+    from src.algorithm.item_knn import ItemKNN
+
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    alg = ItemKNN(k=k, normalize=normalize)
+    alg.fit(X).save(model)
+
+
+@app.command()
+def iknn_load(path: Path = PathArgument, model: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5,
+         k: int = 200, normalize: bool = False):
+    from src.algorithm.item_knn import ItemKNN
+
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    alg = ItemKNN(k=k, normalize=normalize).load(model)
+
+    show_predictions(alg, X, top_k=top_k)
 
 
 @app.command()
