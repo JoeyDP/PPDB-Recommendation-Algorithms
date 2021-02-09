@@ -7,11 +7,8 @@ import scipy.sparse
 
 
 class Popularity(Algorithm):
+    """ Recommends the most popular items. """
     item_counts: np.array
-
-    def __init__(self, k: int = 200):
-        super().__init__()
-        self.k = k
 
     def fit(self, X: scipy.sparse.csr_matrix) -> 'Popularity':
         self.item_counts = np.asarray(X.sum(axis=0)).flatten() / X.shape[0]

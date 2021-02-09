@@ -7,6 +7,11 @@ import scipy.sparse
 
 
 class EASE(Algorithm):
+    """ The state of the art EASE model that learns based on a constrained least squares auto-regression.
+    Optimizes \hat{B} = argmin_B ||X - XB||^2_F + l2 * ||B||^2_F
+    s.t. diag(B) = 0
+    """
+
     similarity_matrix_: scipy.sparse.csr_matrix
 
     def __init__(self, l2: float = 200):

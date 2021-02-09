@@ -8,6 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 class ItemKNN(Algorithm):
+    """ Recommends based on item nearest neighbors with cosine similarity. """
     similarity_matrix_: scipy.sparse.csr_matrix
 
     def __init__(self, k: int = 200, normalize=False):
