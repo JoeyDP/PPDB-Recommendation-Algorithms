@@ -10,15 +10,16 @@ import implicit
 
 
 class WMF(Algorithm):
+    """ Recommends based on a matrix completion scheme with user and item factors. """
     model: implicit.als.AlternatingLeastSquares
 
     def __init__(self, alpha: float = 40, num_factors: int = 100, regularization: float = 0.01, iterations: int = 20):
         """
-        Initialize the weighted matrix factorization algorithm with confidence generator parameters.
-        :param alpha: Alpha parameter for generating confidence matrix.
+        Initialize the weighted matrix factorization algorithm.
+        :param alpha: Alpha parameter for the confidence of positive samples. Negative samples have conf 1.
         :param num_factors: Dimension of factors used by the user- and item-factors.
-        :param regularization: Regularization parameter used to calculate the Least Squares.
-        :param iterations: Number of iterations to execute the ALS calculations.
+        :param regularization: L2 norm regularization parameter on the factors.
+        :param iterations: Number of iterations to execute the ALS calculation.
         """
         super().__init__()
         self.alpha = alpha

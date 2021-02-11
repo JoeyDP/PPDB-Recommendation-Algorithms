@@ -12,6 +12,10 @@ class ItemKNN(Algorithm):
     similarity_matrix_: scipy.sparse.csr_matrix
 
     def __init__(self, k: int = 200, normalize=False):
+        """
+        :param k: Amount of neighbors to keep per item.
+        :param normalize: Whether to normalize the weights row-wise.
+        """
         super().__init__()
         self.k = k                      # k=0 means no max neighbors
         self.normalize = normalize

@@ -11,10 +11,12 @@ class EASE(Algorithm):
     Optimizes \hat{B} = argmin_B ||X - XB||^2_F + l2 * ||B||^2_F
     s.t. diag(B) = 0
     """
-
     similarity_matrix_: scipy.sparse.csr_matrix
 
     def __init__(self, l2: float = 200):
+        """
+        :param l2: l2 norm regularization on B.
+        """
         super().__init__()
         self.l2 = l2
 
