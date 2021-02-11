@@ -1,7 +1,5 @@
 # PPDB-Recommendation-Algorithms
 
-# PPDB-Recommendation-Algorithms
-
 A library of recommendation algorithms for the assignment of "Programming Project Databases 2020-2021".
 
 ## Contents
