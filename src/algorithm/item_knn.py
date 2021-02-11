@@ -38,7 +38,7 @@ class ItemKNN(Algorithm):
         self.similarity_matrix_ = scipy.sparse.csr_matrix(item_cosine_similarities_)
         return self
 
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.ndarray:
         predictions = histories @ self.similarity_matrix_
         return predictions.toarray()
 

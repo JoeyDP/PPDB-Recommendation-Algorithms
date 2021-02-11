@@ -14,7 +14,7 @@ class Algorithm(ABC):
         return self
 
     @abstractmethod
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.ndarray:
         """ Calculates scores per user-item pair for the given user histories. """
         pass
 

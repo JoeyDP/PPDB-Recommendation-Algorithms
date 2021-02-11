@@ -14,7 +14,7 @@ class Popularity(Algorithm):
         self.item_counts = np.asarray(X.sum(axis=0)).flatten() / X.shape[0]
         return self
 
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.ndarray:
         predictions = self.item_counts[np.newaxis, :].repeat(histories.shape[0], axis=0)
         return predictions
 

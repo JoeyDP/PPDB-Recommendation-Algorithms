@@ -3,3 +3,4 @@ pandas==1.2.1
 scikit-learn==0.24.1
 scipy==1.6.0
 typer==0.3.2
+implicit==0.4.4

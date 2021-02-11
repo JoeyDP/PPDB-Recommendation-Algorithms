@@ -117,5 +117,16 @@ def ease(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "
     run(alg, X, top_k=top_k)
 
 
+@app.command()
+def wmf(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5,
+         alpha: float = 40.0, factors: int = 20, regularization: float = 0.01, iterations: int = 20):
+    """ Train and predict with the WMF model. """
+    from src.algorithm.wmf import WMF
+
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    alg = WMF(alpha=alpha, num_factors=factors, regularization=regularization, iterations=iterations)
+    run(alg, X, top_k=top_k)
+
+
 if __name__ == "__main__":
     app()

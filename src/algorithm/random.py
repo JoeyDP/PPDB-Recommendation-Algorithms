@@ -7,7 +7,7 @@ import scipy.sparse
 
 
 class Random(Algorithm):
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.ndarray:
         return np.random.random(histories.shape)
 
     def save(self, path: Path):

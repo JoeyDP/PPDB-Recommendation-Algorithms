@@ -28,16 +28,16 @@ class EASE(Algorithm):
         B = scipy.sparse.identity(X.shape[1]) - P @ scipy.sparse.diags(1.0 / np.diag(P))
         np.fill_diagonal(B, 0)
 
-        self.similarity_matrix_ = scipy.sparse.csr_matrix(B)
+        self.similarity_matrix_ = B
         return self
 
-    def predict(self, histories: scipy.sparse.csr_matrix) -> np.array:
+    def predict(self, histories: scipy.sparse.csr_matrix) -> np.ndarray:
         predictions = histories @ self.similarity_matrix_
-        return predictions.toarray()
+        return predictions
 
     def save(self, path: Path):
-        scipy.sparse.save_npz(path, self.similarity_matrix_)
+        np.savez_compressed(path, B=self.similarity_matrix_)
 
     def load(self, path: Path) -> 'EASE':
-        self.similarity_matrix_ = scipy.sparse.load_npz(path)
+        self.similarity_matrix_ = np.load(path)['B']
         return self
