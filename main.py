@@ -45,6 +45,23 @@ def run(alg: Algorithm, X: scipy.sparse.csr_matrix, top_k: int = 5):
     show_recommendations(alg, X, top_k=top_k)
 
 
+def run_sg(alg: Algorithm, X: scipy.sparse.csr_matrix, test_users: int = 1000, perc_history: float = 0.8, top_k: int = 5):
+    """ Train a model and calculate recall@k using strong generalization. """
+    from src.cross_validation.strong_generalization import strong_generalization
+    from src.metric.recall import recall_k
+
+    random.seed(SEED)
+    np.random.seed(SEED)
+
+    Xtrain, Xval_in, Xval_out = strong_generalization(X, test_users=test_users, perc_history=perc_history)
+    alg.fit(Xtrain)
+
+    predictions = alg.predict(Xval_in)
+    recall_scores = recall_k(predictions, Xval_out, top_k)
+    avg_recall = np.average(recall_scores)
+    print(f"Average Recall@{top_k} over {Xval_in.shape[0]} users:", np.around(avg_recall, decimals=5))
+
+
 def show_recommendations(alg: Algorithm, X: scipy.sparse.csr_matrix, top_k: int = 5):
     """ Show the recommendations for random users. """
     random.seed(SEED)
@@ -68,8 +85,8 @@ def iknn(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "
     """ Train and predict with the Item KNN model. """
     from src.algorithm.item_knn import ItemKNN
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = ItemKNN(k=k, normalize=normalize)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     run(alg, X, top_k=top_k)
 
 
@@ -79,8 +96,8 @@ def iknn_save(path: Path = PathArgument, model: Path = PathWArgument, item_col: 
     """ Train the Item KNN model and save it to file. """
     from src.algorithm.item_knn import ItemKNN
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = ItemKNN(k=k, normalize=normalize)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg.fit(X).save(model)
 
 
@@ -90,8 +107,8 @@ def iknn_load(path: Path = PathArgument, model: Path = PathArgument, item_col: s
     """ Load an Item KNN model from file and show predictions. """
     from src.algorithm.item_knn import ItemKNN
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = ItemKNN(k=k, normalize=normalize).load(model)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
 
     show_recommendations(alg, X, top_k=top_k)
 
@@ -101,8 +118,8 @@ def pop(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "u
     """ Train and predict the popularity model. """
     from src.algorithm.popularity import Popularity
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = Popularity()
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     run(alg, X, top_k=top_k)
 
 
@@ -112,9 +129,37 @@ def ease(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "
     """ Train and predict with the EASE model. """
     from src.algorithm.ease import EASE
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = EASE(l2=l2)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     run(alg, X, top_k=top_k)
+
+
+@app.command()
+def ease_sg(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5,
+            l2: float = 200.0, test_users: int = 1000, perc_history: float = 0.8):
+    """ Train and predict with the EASE model using strong generalization. """
+    from src.algorithm.ease import EASE
+
+    random.seed(SEED)
+    np.random.seed(SEED)
+
+    alg = EASE(l2=l2)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    run_sg(alg, X, test_users=test_users, perc_history=perc_history, top_k=top_k)
+
+
+@app.command()
+def iknn_sg(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "userId", top_k: int = 5,
+            k: int = 200, normalize: bool = False, test_users: int = 1000, perc_history: float = 0.8):
+    """ Train and predict with the EASE model using strong generalization. """
+    from src.algorithm.item_knn import ItemKNN
+
+    random.seed(SEED)
+    np.random.seed(SEED)
+
+    alg = ItemKNN(k, normalize)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
+    run_sg(alg, X, test_users=test_users, perc_history=perc_history, top_k=top_k)
 
 
 @app.command()
@@ -123,8 +168,8 @@ def wmf(path: Path = PathArgument, item_col: str = "movieId", user_col: str = "u
     """ Train and predict with the WMF model. """
     from src.algorithm.wmf import WMF
 
-    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     alg = WMF(alpha=alpha, num_factors=factors, regularization=regularization, iterations=iterations)
+    X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     run(alg, X, top_k=top_k)
 
 

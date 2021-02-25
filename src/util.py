@@ -31,7 +31,7 @@ def path_to_csr(path: Path, item_col, user_col):
     return matrix
 
 
-def predictions_to_recommendations(predictions: np.array, top_k: int) -> np.ndarray:
+def predictions_to_recommendations(predictions: np.ndarray, top_k: int) -> np.ndarray:
     """ Takes a matrix of user-item scores and returns a ranked list of the top_k items per user. """
     recommendations = np.argpartition(predictions, -1-np.arange(top_k), axis=1)[:, -top_k:][:, ::-1]
     scores = np.take_along_axis(predictions, recommendations, axis=1)
