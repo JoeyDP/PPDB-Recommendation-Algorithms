@@ -157,7 +157,7 @@ def iknn_sg(path: Path = PathArgument, item_col: str = "movieId", user_col: str 
     random.seed(SEED)
     np.random.seed(SEED)
 
-    alg = ItemKNN(k, normalize)
+    alg = ItemKNN(k=k, normalize=normalize)
     X = util.path_to_csr(path, item_col=item_col, user_col=user_col)
     run_sg(alg, X, test_users=test_users, perc_history=perc_history, top_k=top_k)
 

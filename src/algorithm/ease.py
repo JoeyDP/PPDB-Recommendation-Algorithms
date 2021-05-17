@@ -22,8 +22,10 @@ class EASE(Algorithm):
 
     def fit(self, X: scipy.sparse.csr_matrix) -> 'EASE':
         # Compute P
+        X = X.astype(np.int32)
+
         XTX = (X.T @ X).toarray()
-        P = np.linalg.inv(XTX + self.l2 * scipy.sparse.identity((X.shape[1]), dtype=np.float32))
+        P = np.linalg.inv(XTX + self.l2 * scipy.sparse.identity((X.shape[1]), dtype=np.int32))
         del XTX
 
         # Compute B
