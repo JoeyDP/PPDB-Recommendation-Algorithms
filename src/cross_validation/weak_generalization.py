@@ -16,11 +16,16 @@ def weak_generalization(X: csr_matrix, test_users: int, perc_history: float) -> 
     val_in = X.copy()
     for u in range(val_in.shape[0]):
         items = val_in[u].nonzero()[1]
-        amt_out = max(1, int(len(items) * perc_history))        # at least one test item required
+        amt_out = int(len(items) * perc_history)
+        amt_out = max(1, amt_out)                   # at least one test item required
+        amt_out = min(len(items) - 1, amt_out)      # at least one train item required
         items_out = np.random.choice(items, amt_out, replace=False)
         val_in[u, items_out] = 0
 
+    val_in.eliminate_zeros()
+
     val_out = X.copy()
     val_out[val_in.astype(bool)] = 0
+    val_out.eliminate_zeros()
 
     return val_in, val_in, val_out

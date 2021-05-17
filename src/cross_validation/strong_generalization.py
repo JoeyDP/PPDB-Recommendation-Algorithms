@@ -11,19 +11,35 @@ def strong_generalization(X: csr_matrix, test_users: int, perc_history: float) -
     Users in training and validation are disjoint.
     """
     users = X.shape[0]
+    print("total users", users)
     assert users > test_users, "There should be at least one train user left"
 
-    test_user_ids = np.random.choice(np.arange(users), test_users, replace=False)
-    train, val = X[~test_user_ids], X[test_user_ids]
+
+    active_users = np.array(list(set(X.nonzero()[0])))
+    test_user_ids = np.random.choice(active_users, test_users, replace=False)
+    test_user_mask = np.zeros(users, dtype=bool)
+    test_user_mask[test_user_ids] = 1
+    train, val = X[~test_user_mask], X[test_user_mask]
+    train.eliminate_zeros()
+
+    # print("train/val users (incl zero)", train.shape[0], "/", val.shape[0])
+    # print("train/val users (excl zero)", len(set(train.nonzero()[0])), "/", len(set(val.nonzero()[0])))
 
     val_in = val.copy()
     for u in range(val_in.shape[0]):
         items = val_in[u].nonzero()[1]
-        amt_out = max(1, int(len(items) * perc_history))        # at least one test item required
+        amt_out = int(len(items) * perc_history)
+        amt_out = max(1, amt_out)                   # at least one test item required
+        amt_out = min(len(items) - 1, amt_out)      # at least one train item required
         items_out = np.random.choice(items, amt_out, replace=False)
+
+        # print("user", u, "items in/total", len(items) - len(items_out), len(items), f"({(len(items) - len(items_out)) / len(items)})")
         val_in[u, items_out] = 0
+
+    val_in.eliminate_zeros()
 
     val_out = val
     val_out[val_in.astype(bool)] = 0
+    val_out.eliminate_zeros()
 
     return train, val_in, val_out
